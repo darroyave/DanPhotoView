@@ -8,7 +8,11 @@
     Title="DanPhotoView">
 
     <ShellContent
+<<<<<<< HEAD
         Title="Gallery"
+=======
+        Title="Home"
+>>>>>>> 16479ae49a10bcef98381843d670e5b709cec3f5
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage" />
 
