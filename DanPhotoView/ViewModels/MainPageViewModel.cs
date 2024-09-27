@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DanPhotoView.Models;
+using SkiaSharp;
 using System.Collections.ObjectModel;
 
 namespace DanPhotoView.ViewModels;
@@ -8,10 +9,19 @@ namespace DanPhotoView.ViewModels;
 public partial class MainPageViewModel: ObservableObject
 {
     [ObservableProperty]
+    private int _loadedImagesCount = 0;
+
+    [ObservableProperty]
+    private int _imagesBatchSize = 50;
+
+    [ObservableProperty]
     private ObservableCollection<ImageItem> _images = [];
 
     [ObservableProperty]
-    public ObservableCollection<DirectoryItem> _directories = [];
+    private ObservableCollection<DirectoryItem> _directories = [];
+
+    [ObservableProperty]
+    private DirectoryItem? selectedDirectory;
 
     public MainPageViewModel()
     {
@@ -20,7 +30,7 @@ public partial class MainPageViewModel: ObservableObject
 
     public void LoadDirectories()
     {
-        string rootPath = "c:\\Design\\Photographers"; 
+        string rootPath = "c:\\App\\Photographers"; 
 
         if (Directory.Exists(rootPath))
         {
@@ -37,29 +47,92 @@ public partial class MainPageViewModel: ObservableObject
 
     private async Task SelectedDirectoryAsync(DirectoryItem directory)
     {
-        LoadImages(directory.Name);
-    }
+        SelectedDirectory = directory;
 
-    public void LoadImages(string folderPath)
-    {
         Images.Clear();
 
-        if (Directory.Exists(folderPath))
-        {
-            var imageFiles = Directory.GetFiles(folderPath, "*.*", SearchOption.TopDirectoryOnly)
-               .Where(f => f.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase)
-                        || f.EndsWith(".png", StringComparison.OrdinalIgnoreCase)
-                        || f.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase));
+        await LoadImages(directory.Name);
+    }
 
-            foreach (var file in imageFiles)
+    [RelayCommand]
+    private async Task RemainingItems()
+    {
+        if (SelectedDirectory != null)
+        {
+            await LoadImages(SelectedDirectory.Name);
+        }
+    }
+
+    public async Task LoadImages(string folderPath)
+    {
+        if (!Directory.Exists(folderPath)) return;
+
+        var allImageFiles = Directory.GetFiles(folderPath, "*.*", SearchOption.TopDirectoryOnly)
+            .Where(f => f.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase)
+                        || f.EndsWith(".png", StringComparison.OrdinalIgnoreCase)
+                        || f.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase))
+             .ToList();
+
+        var remainingImages = allImageFiles.Skip(LoadedImagesCount).Take(ImagesBatchSize).ToList();
+
+        if (!remainingImages.Any()) return;
+
+        foreach (var file in remainingImages)
+        {
+            await Task.Run(() =>
             {
                 var imageItem = new ImageItem
                 {
-                    ImageSource = ImageSource.FromFile(file)
+                    ImageSource = ImageSource.FromStream(() =>
+                    {
+                        using var stream = File.OpenRead(file);
+
+                        var resizedStream = ResizeImage(stream, 100, 100); 
+
+                        return resizedStream;
+                    })
                 };
 
-                Images.Add(imageItem);
-            }
+                MainThread.BeginInvokeOnMainThread(() => Images.Add(imageItem));
+            });
         }
+
+        LoadedImagesCount += ImagesBatchSize;
+    }
+    private Stream ResizeImage(Stream inputStream, int targetWidth, int targetHeight)
+    {
+        using var original = SKBitmap.Decode(inputStream);
+
+        float widthRatio = (float)targetWidth / original.Width;
+        float heightRatio = (float)targetHeight / original.Height;
+        float scale = Math.Min(widthRatio, heightRatio); 
+
+        int finalWidth = (int)(original.Width * scale);
+        int finalHeight = (int)(original.Height * scale);
+
+        var resized = new SKBitmap(finalWidth, finalHeight);
+
+        using (var canvas = new SKCanvas(resized))
+        {
+            var paint = new SKPaint
+            {
+                FilterQuality = SKFilterQuality.High 
+            };
+
+            canvas.DrawBitmap(original, new SKRect(0, 0, finalWidth, finalHeight), paint);
+        }
+    
+        var image = SKImage.FromBitmap(resized);
+
+        var outputStream = new MemoryStream();
+
+        using (var data = image.Encode(SKEncodedImageFormat.Png, 100))
+        {
+            data.SaveTo(outputStream);
+        }
+
+        outputStream.Position = 0;
+
+        return outputStream;
     }
 }
