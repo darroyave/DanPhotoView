@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:DanPhotoView.ViewModels"
+             xmlns:models="clr-namespace:DanPhotoView.Models"
+             x:Class="DanPhotoView.MainPage">
+
+    <ContentPage.BindingContext>
+        <vm:MainPageViewModel />
+    </ContentPage.BindingContext>
+    
+    <Grid ColumnDefinitions="*,3*">
+
+        <!-- Columna izquierda: Lista de directorios -->
+        <CollectionView Grid.Column="0" ItemsSource="{Binding Directories}"
+                SelectionMode="Single">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:DirectoryItem">
+                    <Label Text="{Binding Name}">
+                        <Label.GestureRecognizers>
+                            <TapGestureRecognizer
+                                Command="{Binding Source={x:RelativeSource AncestorType={x:Type vm:MainPageViewModel}}, Path=SelectedDirectoryCommand}"
+                                CommandParameter="{Binding .}" />
+                        </Label.GestureRecognizers>
+
+                    </Label>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <!-- Columna derecha: Miniaturas de imágenes -->
+        <CollectionView Grid.Column="1" 
+                        ItemsSource="{Binding Images}">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" Span="5" />
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:ImageItem">
+                    <Frame Padding="5" HasShadow="False" BorderColor="Gray">
+                        <Image Source="{Binding ImageSource}" 
+                           Aspect="AspectFill" 
+                           WidthRequest="100" 
+                           HeightRequest="100"/>
+                    </Frame>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+    </Grid>
+
+</ContentPage>
