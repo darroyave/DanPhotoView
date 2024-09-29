@@ -5,10 +5,6 @@
              xmlns:models="clr-namespace:DanPhotoView.Models"
              x:Class="DanPhotoView.MainPage">
 
-    <ContentPage.BindingContext>
-        <vm:MainPageViewModel />
-    </ContentPage.BindingContext>
-    
     <Grid ColumnDefinitions="*,3*" Padding="10">
 
         <!-- Columna izquierda: Lista de directorios -->
@@ -48,7 +44,13 @@
                         <Image Source="{Binding ImageSource}" 
                            Aspect="AspectFill" 
                            WidthRequest="100" 
-                           HeightRequest="100"/>
+                           HeightRequest="100">
+                            <Image.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={x:RelativeSource AncestorType={x:Type vm:MainPageViewModel}}, Path=ShowImagePopupCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Image.GestureRecognizers>
+                        </Image>
                     </Frame>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
