@@ -1,4 +1,6 @@
-﻿using DanPhotoView.ViewModels;
+﻿using CommunityToolkit.Maui;
+using DanPhotoView.Controls;
+using DanPhotoView.ViewModels;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 
@@ -11,6 +13,7 @@ namespace DanPhotoView
             var builder = MauiApp.CreateBuilder();
             builder
                 .UseMauiApp<App>()
+                .UseMauiCommunityToolkit()
                 .ConfigureFonts(fonts =>
                 {
                     fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
@@ -23,6 +26,8 @@ namespace DanPhotoView
             builder.Services.TryAddTransient<MainPage>();
 
             builder.Services.AddTransient<MainPageViewModel>();
+
+            builder.Services.AddTransientPopup<ImagePopup, ImageViewModel>();
 
             return builder.Build();
         }

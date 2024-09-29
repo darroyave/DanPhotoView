@@ -1,11 +1,15 @@
-﻿namespace DanPhotoView;
+﻿using DanPhotoView.ViewModels;
+
+namespace DanPhotoView;
 
 public partial class MainPage : ContentPage
 {
 
-    public MainPage()
+    public MainPage(MainPageViewModel viewModel)
     {
         InitializeComponent();
+
+        BindingContext = viewModel;
     }
 
 }

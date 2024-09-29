@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Maui.Core;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DanPhotoView.Models;
 using SkiaSharp;
@@ -23,8 +24,12 @@ public partial class MainPageViewModel: ObservableObject
     [ObservableProperty]
     private DirectoryItem? selectedDirectory;
 
-    public MainPageViewModel()
+    private readonly IPopupService _popupService;
+
+    public MainPageViewModel(IPopupService popupService)
     {
+        _popupService = popupService;
+
         LoadDirectories();
     }
 
@@ -90,7 +95,8 @@ public partial class MainPageViewModel: ObservableObject
                         var resizedStream = ResizeImage(stream, 100, 100); 
 
                         return resizedStream;
-                    })
+                    }),
+                    Path = file
                 };
 
                 MainThread.BeginInvokeOnMainThread(() => Images.Add(imageItem));
@@ -134,5 +140,15 @@ public partial class MainPageViewModel: ObservableObject
         outputStream.Position = 0;
 
         return outputStream;
+    }
+
+    [RelayCommand]
+    private void ShowImagePopup(ImageItem imageItem)
+    {
+        if (imageItem != null)
+        {
+            _popupService.ShowPopup<ImageViewModel>(
+                onPresenting: viewModel => viewModel.ShowInfo(imageItem.Path));
+        }
     }
 }
