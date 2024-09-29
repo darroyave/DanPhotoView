@@ -17,4 +17,9 @@ public partial class ImagePopup : Popup
 
         BindingContext = viewModel;
     }
+
+    private void TapGestureRecognizer_Tapped(object sender, TappedEventArgs e)
+    {
+        Close();
+    }
 }
