@@ -15,7 +15,6 @@ public partial class ImagePopup : Popup
         panelMain.WidthRequest = screenWidth * 0.8;
         panelMain.HeightRequest = screenHeight * 0.8;
 
-
         BindingContext = viewModel;
     }
 }
