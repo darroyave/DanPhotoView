@@ -33,6 +33,9 @@ public partial class MainPageViewModel : ObservableObject
     [ObservableProperty]
     private DirectoryItem? selectedDirectory;
 
+    [ObservableProperty]
+    private string _rootPath = "c:\\App\\Photographers";
+
     private readonly IPopupService _popupService;
     private readonly IImageService _imageService;
 
@@ -50,11 +53,11 @@ public partial class MainPageViewModel : ObservableObject
 
     public void LoadDirectories()
     {
-        string rootPath = "c:\\App\\Photographers";
+        Directories.Clear();
 
-        if (Directory.Exists(rootPath))
+        if (Directory.Exists(RootPath))
         {
-            var path = Directory.GetDirectories(rootPath);
+            var path = Directory.GetDirectories(RootPath);
 
             foreach (var dir in path)
             {
@@ -70,6 +73,8 @@ public partial class MainPageViewModel : ObservableObject
         SelectedDirectory = directory;
 
         Images.Clear();
+
+        LoadedImagesCount = 0;
 
         await LoadImages(directory.Name);
     }
@@ -105,7 +110,7 @@ public partial class MainPageViewModel : ObservableObject
                 {
                     ImageSource = ImageSource.FromStream(() =>
                     {
-                        using var stream = File.OpenRead(file);
+                        var stream = File.OpenRead(file);
 
                         var thumbStream = _imageService.CreateThumbnail(stream, ThumbWidth, ThumbHeight);
 
@@ -118,7 +123,7 @@ public partial class MainPageViewModel : ObservableObject
             });
         }
 
-        LoadedImagesCount += ImagesBatchSize;
+        LoadedImagesCount += remainingImages.Count;
     }
 
     [RelayCommand]
@@ -132,12 +137,19 @@ public partial class MainPageViewModel : ObservableObject
     }
 
     [RelayCommand]
-    async Task PickFolder(CancellationToken cancellationToken)
+    async Task PickFolder()
     {
-        var result = await _folderPicker.PickAsync(cancellationToken);
-        result.EnsureSuccess();
+        var result = await _folderPicker.PickAsync(default);
+        if (result.IsSuccessful && result.Folder != null)
+        {
+            RootPath = result.Folder.Path;
 
+            LoadDirectories();
 
+            SelectedDirectory = null;
+            Images.Clear();
+            LoadedImagesCount = 0;
+        }
     }
 
 }

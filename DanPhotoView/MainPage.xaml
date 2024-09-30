@@ -5,9 +5,19 @@
              xmlns:models="clr-namespace:DanPhotoView.Models"
              x:Class="DanPhotoView.MainPage">
 
-    <Grid ColumnDefinitions="*,3*" Padding="10">
+    <Grid RowDefinitions="Auto,*" ColumnDefinitions="*,3*" Padding="10">
 
-        <CollectionView Grid.Column="0" ItemsSource="{Binding Directories}"
+        <Button Grid.Row="0" Grid.Column="0"
+                Text="Select Folder"
+                Command="{Binding PickFolderCommand}" />
+
+        <Label Grid.Row="0" Grid.Column="1"
+            Text="{Binding RootPath}"
+            FontAttributes="Bold"
+            VerticalOptions="Center"
+            Margin="0,5,0,5" />
+        
+        <CollectionView Grid.Row="1" Grid.Column="0" ItemsSource="{Binding Directories}"
                 SelectionMode="Single">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:DirectoryItem">
@@ -24,7 +34,7 @@
         </CollectionView>
 
         <CollectionView
-            Grid.Column="1"
+            Grid.Row="1" Grid.Column="1"
             VerticalOptions="FillAndExpand"
             SelectionMode="Single"
             ItemsUpdatingScrollMode="KeepItemsInView"
@@ -54,7 +64,6 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
         
-
     </Grid>
 
 </ContentPage>
