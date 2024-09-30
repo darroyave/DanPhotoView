@@ -13,14 +13,29 @@ public class ImageService : IImageService
     {
         using var original = SKBitmap.Decode(inputStream);
 
+        var aspectRatio = (float)original.Width / original.Height;
+
+        int newWidth, newHeight;
+
+        if (aspectRatio > 1)
+        {
+            newWidth = targetWidth;
+            newHeight = (int)(targetWidth / aspectRatio);
+        }
+        else
+        {
+            newHeight = targetHeight;
+            newWidth = (int)(targetHeight * aspectRatio);
+        }
+
         using var resized = original
-            .Resize(new SKImageInfo(targetHeight, targetWidth), SKFilterQuality.None);
+            .Resize(new SKImageInfo(newWidth, newHeight), SKFilterQuality.High);
 
         var image = SKImage.FromBitmap(resized);
 
         var outputStream = new MemoryStream();
 
-        using (var data = image.Encode(SKEncodedImageFormat.Png, 0))
+        using (var data = image.Encode(SKEncodedImageFormat.Png, 100))
         {
             data.SaveTo(outputStream);
         }
