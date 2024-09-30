@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui;
 using DanPhotoView.Controls;
+using DanPhotoView.Service;
 using DanPhotoView.ViewModels;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -28,6 +29,8 @@ namespace DanPhotoView
             builder.Services.AddTransient<MainPageViewModel>();
 
             builder.Services.AddTransientPopup<ImagePopup, ImageViewModel>();
+
+            builder.Services.AddSingleton<IImageService, ImageService>();
 
             return builder.Build();
         }

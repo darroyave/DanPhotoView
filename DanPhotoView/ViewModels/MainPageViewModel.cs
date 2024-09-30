@@ -2,7 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DanPhotoView.Models;
-using SkiaSharp;
+using DanPhotoView.Service;
 using System.Collections.ObjectModel;
 
 namespace DanPhotoView.ViewModels;
@@ -25,10 +25,14 @@ public partial class MainPageViewModel: ObservableObject
     private DirectoryItem? selectedDirectory;
 
     private readonly IPopupService _popupService;
+    private readonly IImageService _imageService;
 
-    public MainPageViewModel(IPopupService popupService)
+    public MainPageViewModel(
+        IPopupService popupService, 
+        IImageService imageService)
     {
         _popupService = popupService;
+        _imageService = imageService;
 
         LoadDirectories();
     }
@@ -92,9 +96,9 @@ public partial class MainPageViewModel: ObservableObject
                     {
                         using var stream = File.OpenRead(file);
 
-                        var resizedStream = ResizeImage(stream, 100, 100); 
+                        var thumbStream = _imageService.CreateThumbnail(stream, 100, 100); 
 
-                        return resizedStream;
+                        return thumbStream;
                     }),
                     Path = file
                 };
@@ -105,43 +109,7 @@ public partial class MainPageViewModel: ObservableObject
 
         LoadedImagesCount += ImagesBatchSize;
     }
-    private Stream ResizeImage(Stream inputStream, int targetWidth, int targetHeight)
-    {
-        using var original = SKBitmap.Decode(inputStream);
-
-        float widthRatio = (float)targetWidth / original.Width;
-        float heightRatio = (float)targetHeight / original.Height;
-        float scale = Math.Min(widthRatio, heightRatio); 
-
-        int finalWidth = (int)(original.Width * scale);
-        int finalHeight = (int)(original.Height * scale);
-
-        var resized = new SKBitmap(finalWidth, finalHeight);
-
-        using (var canvas = new SKCanvas(resized))
-        {
-            var paint = new SKPaint
-            {
-                FilterQuality = SKFilterQuality.High 
-            };
-
-            canvas.DrawBitmap(original, new SKRect(0, 0, finalWidth, finalHeight), paint);
-        }
     
-        var image = SKImage.FromBitmap(resized);
-
-        var outputStream = new MemoryStream();
-
-        using (var data = image.Encode(SKEncodedImageFormat.Png, 100))
-        {
-            data.SaveTo(outputStream);
-        }
-
-        outputStream.Position = 0;
-
-        return outputStream;
-    }
-
     [RelayCommand]
     private void ShowImagePopup(ImageItem imageItem)
     {
