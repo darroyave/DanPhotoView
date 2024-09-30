@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Storage;
 using DanPhotoView.Controls;
 using DanPhotoView.Service;
 using DanPhotoView.ViewModels;
@@ -31,6 +32,8 @@ namespace DanPhotoView
             builder.Services.AddTransientPopup<ImagePopup, ImageViewModel>();
 
             builder.Services.AddSingleton<IImageService, ImageService>();
+
+            builder.Services.AddSingleton<IFolderPicker>(FolderPicker.Default);
 
             return builder.Build();
         }

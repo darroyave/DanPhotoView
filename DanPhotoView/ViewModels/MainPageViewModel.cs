@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Maui.Core;
+using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DanPhotoView.Models;
@@ -7,8 +8,16 @@ using System.Collections.ObjectModel;
 
 namespace DanPhotoView.ViewModels;
 
-public partial class MainPageViewModel: ObservableObject
+public partial class MainPageViewModel : ObservableObject
 {
+    private readonly IFolderPicker? _folderPicker;
+
+    [ObservableProperty]
+    private int _thumbWidth = 200;
+
+    [ObservableProperty]
+    private int _thumbHeight = 200;
+
     [ObservableProperty]
     private int _loadedImagesCount = 0;
 
@@ -28,18 +37,20 @@ public partial class MainPageViewModel: ObservableObject
     private readonly IImageService _imageService;
 
     public MainPageViewModel(
-        IPopupService popupService, 
-        IImageService imageService)
+        IPopupService popupService,
+        IImageService imageService,
+        IFolderPicker folderPicker)
     {
         _popupService = popupService;
         _imageService = imageService;
+        _folderPicker = folderPicker;
 
         LoadDirectories();
     }
 
     public void LoadDirectories()
     {
-        string rootPath = "c:\\App\\Photographers"; 
+        string rootPath = "c:\\App\\Photographers";
 
         if (Directory.Exists(rootPath))
         {
@@ -47,7 +58,7 @@ public partial class MainPageViewModel: ObservableObject
 
             foreach (var dir in path)
             {
-                Directories.Add(new DirectoryItem() { Name = dir});
+                Directories.Add(new DirectoryItem() { Name = dir });
             }
         }
     }
@@ -96,7 +107,7 @@ public partial class MainPageViewModel: ObservableObject
                     {
                         using var stream = File.OpenRead(file);
 
-                        var thumbStream = _imageService.CreateThumbnail(stream, 100, 100); 
+                        var thumbStream = _imageService.CreateThumbnail(stream, ThumbWidth, ThumbHeight);
 
                         return thumbStream;
                     }),
@@ -109,7 +120,7 @@ public partial class MainPageViewModel: ObservableObject
 
         LoadedImagesCount += ImagesBatchSize;
     }
-    
+
     [RelayCommand]
     private void ShowImagePopup(ImageItem imageItem)
     {
@@ -119,4 +130,14 @@ public partial class MainPageViewModel: ObservableObject
                 onPresenting: viewModel => viewModel.ShowInfo(imageItem.Path));
         }
     }
+
+    [RelayCommand]
+    async Task PickFolder(CancellationToken cancellationToken)
+    {
+        var result = await _folderPicker.PickAsync(cancellationToken);
+        result.EnsureSuccess();
+
+
+    }
+
 }

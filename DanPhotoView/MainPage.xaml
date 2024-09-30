@@ -7,7 +7,6 @@
 
     <Grid ColumnDefinitions="*,3*" Padding="10">
 
-        <!-- Columna izquierda: Lista de directorios -->
         <CollectionView Grid.Column="0" ItemsSource="{Binding Directories}"
                 SelectionMode="Single">
             <CollectionView.ItemTemplate>
@@ -24,7 +23,6 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <!-- Columna derecha: Miniaturas de imágenes -->
         <CollectionView
             Grid.Column="1"
             VerticalOptions="FillAndExpand"
@@ -35,7 +33,7 @@
             ItemsSource="{Binding Images}">
             
             <CollectionView.ItemsLayout>
-                <GridItemsLayout Orientation="Vertical" Span="5" />
+                <GridItemsLayout Orientation="Vertical" Span="6" />
             </CollectionView.ItemsLayout>
 
             <CollectionView.ItemTemplate>
