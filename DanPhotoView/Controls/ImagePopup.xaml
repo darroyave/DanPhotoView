@@ -6,35 +6,36 @@
 
     <Border
         x:Name="panelMain"
-        BackgroundColor="Wheat"
-        StrokeShape="RoundRectangle 10"
-        StrokeThickness="0">
+        BackgroundColor="LightGray"
+        Padding="15">
 
-        <VerticalStackLayout Padding="20" Spacing="10">
+        <VerticalStackLayout Padding="10" Spacing="10">
 
             <!--  Header  -->
             <Grid
                 Padding="15,8"
-                BackgroundColor="Maroon"
+                BackgroundColor="DarkSlateGray"
                 ColumnDefinitions="*, Auto">
 
                 <Label
                     Grid.Column="0"
                     FontSize="18"
                     Text="Display Image"
-                    TextColor="White" />
+                    TextColor="White"
+                    FontAttributes="Bold"
+                    VerticalTextAlignment="Center" />
 
                 <Label
                     Grid.Column="1"
-                    BackgroundColor="Red"
+                    BackgroundColor="Transparent"
                     FontAttributes="Bold"
-                    FontSize="18"
-                    HeightRequest="25"
+                    HeightRequest="30"
                     HorizontalTextAlignment="Center"
-                    Text="X"
+                    Text="✕"
                     TextColor="White"
                     VerticalTextAlignment="Center"
-                    WidthRequest="25">
+                    WidthRequest="30"
+                    Padding="5">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="TapGestureRecognizer_Tapped" />
                     </Label.GestureRecognizers>
@@ -42,9 +43,13 @@
 
             </Grid>
 
-            
-            <Image Source="{Binding ImagePath}" 
-                Aspect="AspectFit" />
+            <Image 
+                Source="{Binding ImagePath}" 
+                Aspect="AspectFit"
+                HorizontalOptions="Center"
+                VerticalOptions="Center"
+                MaximumHeightRequest="{Binding PopupMaxHeight}"
+                MaximumWidthRequest="{Binding PopupMaxWidth}" />
 
         </VerticalStackLayout>
         
