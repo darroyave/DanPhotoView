@@ -5,6 +5,10 @@
              xmlns:models="clr-namespace:DanPhotoView.Models"
              x:Class="DanPhotoView.MainPage">
 
+    <ContentPage.Resources>
+        <x:Double x:Key="ItemWidth">100</x:Double>
+    </ContentPage.Resources>
+    
     <Grid RowDefinitions="Auto,*" ColumnDefinitions="*,3*" Padding="10">
 
         <Button Grid.Row="0" Grid.Column="0"
@@ -34,6 +38,7 @@
         </CollectionView>
 
         <CollectionView
+            x:Name="imagesCollectionView"
             Grid.Row="1" Grid.Column="1"
             VerticalOptions="FillAndExpand"
             SelectionMode="Single"
@@ -43,14 +48,17 @@
             ItemsSource="{Binding Images}">
             
             <CollectionView.ItemsLayout>
-                <GridItemsLayout Orientation="Vertical" Span="6" />
+                <GridItemsLayout x:Name="gridItemsLayout" Orientation="Vertical" Span="6" />
             </CollectionView.ItemsLayout>
 
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:ImageItem">
                     <Frame Padding="5" HasShadow="False" BorderColor="Gray">
-                        <Image Source="{Binding ImageSource}" 
-                           Aspect="AspectFill">
+                        <Image 
+                            Source="{Binding ImageSource}" 
+                            WidthRequest="{StaticResource ItemWidth}" 
+                            HeightRequest="{StaticResource ItemWidth}"
+                            Aspect="AspectFill">
                             <Image.GestureRecognizers>
                                 <TapGestureRecognizer
                                     Command="{Binding Source={x:RelativeSource AncestorType={x:Type vm:MainPageViewModel}}, Path=ShowImagePopupCommand}"

@@ -13,16 +13,16 @@ public partial class MainPageViewModel : ObservableObject
     private readonly IFolderPicker? _folderPicker;
 
     [ObservableProperty]
-    private int _thumbWidth = 200;
+    private int _thumbWidth = 100;
 
     [ObservableProperty]
-    private int _thumbHeight = 200;
+    private int _thumbHeight = 100;
 
     [ObservableProperty]
     private int _loadedImagesCount = 0;
 
     [ObservableProperty]
-    private int _imagesBatchSize = 50;
+    private int _imagesBatchSize = 100;
 
     [ObservableProperty]
     private ObservableCollection<ImageItem> _images = [];

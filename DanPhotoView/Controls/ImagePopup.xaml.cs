@@ -5,7 +5,7 @@ namespace DanPhotoView.Controls;
 
 public partial class ImagePopup : Popup
 {
-	public ImagePopup(ImageViewModel viewModel)
+    public ImagePopup(ImageViewModel viewModel)
 	{
 		InitializeComponent();
 
@@ -25,4 +25,5 @@ public partial class ImagePopup : Popup
     {
         Close();
     }
+
 }

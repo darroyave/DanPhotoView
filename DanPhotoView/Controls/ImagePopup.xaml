@@ -43,14 +43,20 @@
 
             </Grid>
 
-            <Image 
-                Source="{Binding ImagePath}" 
-                Aspect="AspectFit"
-                HorizontalOptions="Center"
-                VerticalOptions="Center"
-                MaximumHeightRequest="{Binding PopupMaxHeight}"
-                MaximumWidthRequest="{Binding PopupMaxWidth}" />
+            <Grid>
 
+                <Image 
+                    x:Name="popupImage"
+                    Source="{Binding ImagePath}" 
+                    Aspect="AspectFit"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center"
+                    MaximumHeightRequest="{Binding PopupMaxHeight}"
+                    MaximumWidthRequest="{Binding PopupMaxWidth}" >
+                </Image>
+                
+            </Grid>
+            
         </VerticalStackLayout>
         
     </Border>
